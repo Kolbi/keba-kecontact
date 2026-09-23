@@ -357,6 +357,26 @@ class ChargingStation:
 
         await self._send(f"setenergy {int(round(energy * 10000))}", fast_polling=True)
 
+    async def set_datetime(self, timestamp: int | float | None = None) -> None:
+        """Set date and time of the charging station.
+
+        Args:
+            timestamp (int | float | None, optional): Unix epoch time in seconds.
+                If omitted, the current system time is used.
+        """
+        if KebaService.SET_DATETIME not in self.device_info.services:
+            raise NotImplementedError(
+                "set_datetime is not available for the given charging station"
+            )
+
+        if timestamp is None:
+            timestamp = datetime.datetime.now(datetime.UTC).timestamp()
+
+        if not isinstance(timestamp, int | float) or timestamp < 0:
+            raise ValueError("Timestamp must be a non-negative Unix epoch value.")
+
+        await self._send(f"setdatetime {int(timestamp)}")    
+    
     async def set_output(self, out: int) -> None:
         """Set output.
 
