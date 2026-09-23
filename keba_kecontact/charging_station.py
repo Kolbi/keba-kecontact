@@ -79,7 +79,7 @@ class ChargingStation:
                 self.device_info.host,
             )
 
-    async def datagram_received(self, data: str) -> None:  # noqa: PLR0912
+    async def datagram_received(self, data: str) -> None:
         """Handle received datagram.
 
         Args:
@@ -504,7 +504,7 @@ class ChargingStation:
 
         self._loop.create_task(cool_down(self._x2_cool_down_lock))
 
-    async def set_charging_power(  # noqa: PLR0912, PLR0915
+    async def set_charging_power(
         self, power: int | float, round_up: bool = False, stop_below_6_ampere: bool = True
     ) -> bool:
         """Set charging power.
