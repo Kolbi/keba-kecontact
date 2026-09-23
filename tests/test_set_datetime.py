@@ -23,18 +23,11 @@ def test_set_datetime() -> None:
 
     async def run_test() -> None:
         station = ChargingStation(
-            connection,
-            info,
-            asyncio.get_running_loop(),
-            periodic_request=False,
+            connection, info, asyncio.get_running_loop(), periodic_request=False
         )
 
         await station.set_datetime(1497944434)
 
     asyncio.run(run_test())
 
-    connection.send.assert_awaited_once_with(
-        "127.0.0.1",
-        "setdatetime 1497944434",
-        0,
-    )
+    connection.send.assert_awaited_once_with("127.0.0.1", "setdatetime 1497944434", 0)

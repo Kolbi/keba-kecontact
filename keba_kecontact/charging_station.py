@@ -363,6 +363,7 @@ class ChargingStation:
         Args:
             timestamp (int | float | None, optional): Unix epoch time in seconds.
                 If omitted, the current system time is used.
+
         """
         if KebaService.SET_DATETIME not in self.device_info.services:
             raise NotImplementedError(
@@ -375,8 +376,8 @@ class ChargingStation:
         if not isinstance(timestamp, int | float) or timestamp < 0:
             raise ValueError("Timestamp must be a non-negative Unix epoch value.")
 
-        await self._send(f"setdatetime {int(timestamp)}")    
-    
+        await self._send(f"setdatetime {int(timestamp)}")
+
     async def set_output(self, out: int) -> None:
         """Set output.
 
