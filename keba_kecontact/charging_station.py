@@ -79,7 +79,7 @@ class ChargingStation:
                 self.device_info.host,
             )
 
-    async def datagram_received(self, data: str) -> None:  # noqa: PLR0912
+    async def datagram_received(self, data: str) -> None:
         """Handle received datagram.
 
         Args:
@@ -131,7 +131,7 @@ class ChargingStation:
             ReportField.E_START,
         ]
         for k in ten_thousands:
-            json_rcv[k] = round(json_rcv[k] / 10000.0, 2)
+            json_rcv[k] = json_rcv[k] / 10000.0
 
         # Extract plug state
         if ReportField.PLUG in json_rcv:
@@ -160,7 +160,7 @@ class ChargingStation:
             json_rcv[ReportField.FS_ON] = json_rcv[ReportField.TMO_FS] > 0
 
         if ReportField.P in json_rcv:
-            json_rcv[ReportField.P] = round(json_rcv[ReportField.P] / 1000000.0, 2)
+            json_rcv[ReportField.P] = json_rcv[ReportField.P] / 1000000.0
 
         # Cleanup invalid values
         if ReportField.CURR_HW in json_rcv and json_rcv[ReportField.CURR_HW] == 0:
@@ -357,6 +357,27 @@ class ChargingStation:
 
         await self._send(f"setenergy {int(round(energy * 10000))}", fast_polling=True)
 
+    async def set_datetime(self, timestamp: int | float | None = None) -> None:
+        """Set date and time of the charging station.
+
+        Args:
+            timestamp (int | float | None, optional): Unix epoch time in seconds.
+                If omitted, the current system time is used.
+
+        """
+        if KebaService.SET_DATETIME not in self.device_info.services:
+            raise NotImplementedError(
+                "set_datetime is not available for the given charging station"
+            )
+
+        if timestamp is None:
+            timestamp = datetime.datetime.now(datetime.UTC).timestamp()
+
+        if not isinstance(timestamp, int | float) or timestamp < 0:
+            raise ValueError("Timestamp must be a non-negative Unix epoch value.")
+
+        await self._send(f"setdatetime {int(timestamp)}")
+
     async def set_output(self, out: int) -> None:
         """Set output.
 
@@ -483,7 +504,7 @@ class ChargingStation:
 
         self._loop.create_task(cool_down(self._x2_cool_down_lock))
 
-    async def set_charging_power(  # noqa: PLR0912, PLR0915
+    async def set_charging_power(
         self, power: int | float, round_up: bool = False, stop_below_6_ampere: bool = True
     ) -> bool:
         """Set charging power.
